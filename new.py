@@ -2,6 +2,8 @@ import imaplib
 import email
 from email.header import decode_header
 import os
+from time import sleep
+
 from PyPDF2 import PdfReader  # For reading PDFs
 import pandas as pd          # For reading Excel files\
 import pdfplumber
@@ -15,7 +17,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 # Azure OpenAI endpoint and API key
 url = "https://acko-01-ai.openai.azure.com/openai/deployments/gpt-4o/chat/completions"
-api_key = ""
+api_key = "4b7WlybtpksybjbIl3emhyTSRYYmkeD4RkIaGm6BdmW2hqrbo5ZuJQQJ99ALACfhMk5XJ3w3AAABACOGioal"
 
 
 def query_chatgpt(prompt):
@@ -307,8 +309,10 @@ def job():
 
 # Schedule this function using Cron or similar tools
 if __name__ == '__main__':
-    # specific_sender = "rahultg741@gmail.com"  # Replace with the sender's email address
-    # check_email_from_specific_sender(specific_sender)
+    specific_sender = "rahultg741@gmail.com"  # Replace with the sender's email address
+    while(True):
+        check_email_from_specific_sender(specific_sender)
+        sleep(1)
 
     data = '''
     Extract and fill the following fields based on the provided text. If data is missing, respond with null and put all the fields in a map. Give only the map in response
@@ -433,6 +437,7 @@ FHPL
 
     '''
     response = query_chatgpt(data)
+    print(response)
 
     # prompt = generate_prompt(text)
     # response = query_chatgpt(prompt)
@@ -442,13 +447,13 @@ FHPL
     # pdf_path = "documents/Endorsement-Schedule-GMC123456107.pdf"
     # text = process_pdf(pdf_path)
 
-    scheduler = BackgroundScheduler()
+    # scheduler = BackgroundScheduler()
+    #
+    # scheduler.add_job(job, 'interval', minutes=1)
+    # scheduler.start()
 
-    scheduler.add_job(job, 'interval', minutes=1)
-    scheduler.start()
-
-    try:
-        while True:
-            pass
-    except (KeyboardInterrupt, SystemExit):
-        scheduler.shutdown()
+    # try:
+    #     while True:
+    #         pass
+    # except (KeyboardInterrupt, SystemExit):
+    #     scheduler.shutdown()

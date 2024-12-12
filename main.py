@@ -8,9 +8,9 @@ import httpx
 
 def check_email():
     # Connect to IMAP server
-    server = ''
-    username = ''
-    password = ''
+    server = 'imap.gmail.com'
+    username = 'xyz69641@gmail.com'
+    password = 'yxhm uuly payy rugr'
 
     mail = imaplib.IMAP4_SSL(server)
     mail.login(username, password)
@@ -48,8 +48,8 @@ def process_email(msg):
                 print(f"Attachment saved: {filename}")
 
 # Azure OpenAI endpoint and API key
-url = ""
-api_key = ""
+url = "https://acko-01-ai.openai.azure.com/openai/deployments/gpt-4o/chat/completions"
+api_key = "4b7WlybtpksybjbIl3emhyTSRYYmkeD4RkIaGm6BdmW2hqrbo5ZuJQQJ99ALACfhMk5XJ3w3AAABACOGioal"
 
 
 def query_chatgpt(prompt):
@@ -150,6 +150,10 @@ def generate_prompt(text):
 
 # Schedule this function using Cron or similar tools
 if __name__ == '__main__':
-    # check_email()
+    while(True):
+        check_email()
+
+
+
     # ca_certs = certifi.where()
     query_chatgpt(generate_prompt("Dear Acko, I am writing to inform you about my recent accident. I was driving my car on the highway when a truck hit me from behind. I have attached the police report and photos of the accident. Please process my claim at the earliest."))
