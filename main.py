@@ -8,9 +8,9 @@ import httpx
 
 def check_email():
     # Connect to IMAP server
-    server = 'imap.gmail.com'
-    username = 'xyz69641@gmail.com'
-    password = 'yxhm uuly payy rugr'
+    server = ''
+    username = ''
+    password = ''
 
     mail = imaplib.IMAP4_SSL(server)
     mail.login(username, password)
@@ -49,7 +49,7 @@ def process_email(msg):
 
 # Azure OpenAI endpoint and API key
 url = "https://acko-01-ai.openai.azure.com/openai/deployments/gpt-4o/chat/completions"
-api_key = "4b7WlybtpksybjbIl3emhyTSRYYmkeD4RkIaGm6BdmW2hqrbo5ZuJQQJ99ALACfhMk5XJ3w3AAABACOGioal"
+api_key = ""
 
 
 def query_chatgpt(prompt):

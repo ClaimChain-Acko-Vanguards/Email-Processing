@@ -5,7 +5,7 @@ import os
 from time import sleep
 
 from PyPDF2 import PdfReader  # For reading PDFs
-import pandas as pd          # For reading Excel files\
+import pandas as pd  # For reading Excel files\
 import pdfplumber
 from pdf2image import convert_from_path
 import pytesseract
@@ -17,7 +17,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 # Azure OpenAI endpoint and API key
 url = "https://acko-01-ai.openai.azure.com/openai/deployments/gpt-4o/chat/completions"
-api_key = "4b7WlybtpksybjbIl3emhyTSRYYmkeD4RkIaGm6BdmW2hqrbo5ZuJQQJ99ALACfhMk5XJ3w3AAABACOGioal"
+api_key = ""
 
 
 def query_chatgpt(prompt):
@@ -59,64 +59,63 @@ def generate_prompt(text):
     Extract and fill the following fields based on the provided text. If data is missing, respond with null and put all the fields in a map. Give only the map in response
 
     Fields:
-    1. Ledger ID
-    2. Policy Type
-    3. Policy Number
-    4. Claim ID
-    5. Claimant Name
-    6. Phone Number
-    7. Email ID
-    8. Aadhar ID
-    9. Abha ID
-    10. Insurer Name
-    11. Claim Status
-    12. Claim Date
-    13. Claim Amount (₹)
-    14. Settlement Amount (₹)
-    15. Settlement Date
-    16. Fraud Score (%)
-    17. Pincode
-    18. City
-    19. State
-    20. Vehicle Registration No.
-    21. Vehicle Type
-    22. Vehicle Make and Model
-    23. Car/Bike Age
-    24. Accident Date
-    25. Accident Location
-    26. Garage Name
-    27. Repair Estimate (₹)
-    28. Driving Behavior Data
-    29. Hospital Name
-    30. Diagnosis/Illness
-    31. Hospitalization Start Date
-    32. Hospitalization End Date
-    33. Total Medical Expenses (₹)
-    34. Pre-Approved Amount (₹)
-    35. Hospital Bills
-    36. Test Reports
-    37. Initial Analysis
-    38. Final Analysis
-    39. Travel Dates
-    40. Trip Destination
-    41. Flight Details
-    42. Reason for Claim
-    43. Nominee Name
-    44. Policy Coverage (₹)
-    45. Cause Proof
-    46. Cause Statement
-    47. IoT Data Available
-    48. Third-Party Involvement
-    49. Error Codes
-    50. Claim Processing Time
-    51. Supporting Documents
-    52. Policy Start Date
-    53. Policy End Date
+    Here is the list numbered:
 
+    1. ledgerId  
+    2. policyType  
+    3. policyNumber  
+    4. claimId  
+    5. claimantName  
+    6. phoneNumber  
+    7. emailId  
+    8. aadharId  
+    9. insurerName  
+    10. claimStatus  
+    11. claimDate  
+    12. claimAmount  
+    13. settlementAmount  
+    14. settlementDate  
+    15. fraudScore  
+    16. pincode  
+    17. city  
+    18. state  
+    19. causeProof  
+    20. causeStatement  
+    21. thirdPartyInvolvement  
+    22. errorCodes  
+    23. claimProcessingTime  
+    24. supportingDocuments  
+    25. reasonForClaim  
+    26. abhaId  
+    27. hospitalName  
+    28. diagnosisOrIllness  
+    29. hospitalizationStartDate  
+    30. hospitalizationEndDate  
+    31. totalMedicalExpenses  
+    32. preApprovedAmount  
+    33. hospitalBills  
+    34. testReports  
+    35. initialAnalysis  
+    36. finalAnalysis  
+    37. iotDataAvailable  
+    38. nomineeName  
+    39. policyCoverage  
+    40. vehicleRegistrationNo  
+    41. vehicleType  
+    42. vehicleMakeAndModel  
+    43. carBikeAge  
+    44. accidentDate  
+    45. accidentLocation  
+    46. garageName  
+    47. repairEstimate  
+    48. drivingBehaviorData  
+    49. policyStartDate
+    50. policyEndDate
 
     Text:
     {text}
     """
+
 
 def decode_header_value(header_value):
     """Decodes email header values to handle special characters."""
@@ -166,6 +165,7 @@ def check_email_from_specific_sender(sender_email):
                 text = process_email(msg)
                 prompt = generate_prompt(text)
                 response = query_chatgpt(prompt)
+                upload_claim(response)
                 print(response)
 
         else:
@@ -207,7 +207,7 @@ def process_email(msg):
                     response = read_txt(filepath)
                 elif filename.endswith(".xlsx") or filename.endswith(".xls"):
                     response = read_excel(filepath)
-                body+=response
+                body += response
     return body
 
 
@@ -249,14 +249,11 @@ def read_excel(filepath):
         print(f"Error reading Excel {filepath}: {e}")
 
 
-
-
-
 def extract_text_from_pdf(pdf_path):
     with pdfplumber.open(pdf_path) as pdf:
         full_text = ""
         for page in pdf.pages:
-            full_text += page.extract_text() # Extract typed text
+            full_text += page.extract_text()  # Extract typed text
     print(full_text)
     return full_text
 
@@ -301,159 +298,34 @@ def process_pdf(pdf_path):
     return full_text
 
 
-
 def job():
     specific_sender = "rahultg741@gmail.com"  # Replace with the sender's email address
     check_email_from_specific_sender(specific_sender)
 
 
+def upload_claim(response):
+    url = 'http://localhost:8080/claims/upload'
+    headers = {
+        'Content-Type': 'application/json',
+        'Cookie': 'JSESSIONID=87FDF0E79EF0FE39C3B70B7E1C234D13'
+    }
+
+    payload = response
+    print(payload)
+    try:
+        response = requests.post(url, headers=headers, json=payload)
+
+        if response.status_code == 200:
+            print("Claim uploaded successfully:", response.json())
+        else:
+            print("Failed to upload claim:", response.status_code, response.text)
+    except requests.exceptions.RequestException as e:
+        print("Error during the request:", e)
+
+
 # Schedule this function using Cron or similar tools
 if __name__ == '__main__':
     specific_sender = "rahultg741@gmail.com"  # Replace with the sender's email address
-    while(True):
+    while (True):
         check_email_from_specific_sender(specific_sender)
         sleep(1)
-
-    data = '''
-    Extract and fill the following fields based on the provided text. If data is missing, respond with null and put all the fields in a map. Give only the map in response
-
-    Fields:
-    1. Ledger ID
-    2. Policy Type
-    3. Policy Number
-    4. Claim ID
-    5. Claimant Name
-    6. Phone Number
-    7. Email ID
-    8. Aadhar ID
-    9. Abha ID
-    10. Insurer Name
-    11. Claim Status
-    12. Claim Date
-    13. Claim Amount (₹)
-    14. Settlement Amount (₹)
-    15. Settlement Date
-    16. Fraud Score (%)
-    17. Pincode
-    18. City
-    19. State
-    20. Vehicle Registration No.
-    21. Vehicle Type
-    22. Vehicle Make and Model
-    23. Car/Bike Age
-    24. Accident Date
-    25. Accident Location
-    26. Garage Name
-    27. Repair Estimate (₹)
-    28. Driving Behavior Data
-    29. Hospital Name
-    30. Diagnosis/Illness
-    31. Hospitalization Start Date
-    32. Hospitalization End Date
-    33. Total Medical Expenses (₹)
-    34. Pre-Approved Amount (₹)
-    35. Hospital Bills
-    36. Test Reports
-    37. Initial Analysis
-    38. Final Analysis
-    39. Travel Dates
-    40. Trip Destination
-    41. Flight Details
-    42. Reason for Claim
-    43. Nominee Name
-    44. Policy Coverage (₹)
-    45. Cause Proof
-    46. Cause Statement
-    47. IoT Data Available
-    48. Third-Party Involvement
-    49. Error Codes
-    50. Claim Processing Time
-    51. Supporting Documents
-    52. Policy Start Date
-    53. Policy End Date
-
-
-    Text:
-    Dear Go Digit Insurance,
-
-Please find below the details of the health claim submitted for processing
-under the policy.
-
-Insurer Name: Go Digit Insurance Co.
-
-Claimant Details:
-
-Name: Mr. Rahul Sharma
-Age: 42
-Policy Number: XYZ12345678
-Sum Insured: ₹10,00,000
-
-Hospitalization Details:
-
-Start Date: 01 December 2024
-End Date: 05 December 2024
-Hospital Name: City Care Hospital, Mumbai
-Claim Details:
-
-Total Medical Expenses (₹): ₹2,50,000
-Pre-Approved Amount (₹): ₹1,50,000
-Policy Coverage (₹): ₹10,00,000
-Supporting Documents:
-
-Hospital Bills (Attached)
-Test Reports (Attached)
-Cause Proof: Medical Certificate from attending physician (Attached)
-Reason for Claim: Treatment for acute appendicitis requiring laparoscopic
-surgery.
-
-Cause Statement: The patient experienced severe abdominal pain and was
-diagnosed with acute appendicitis following a CT scan. Surgery was
-performed to prevent complications.
-
-Third-Party Involvement: None
-
-Error Codes: N/A
-
-Claim Processing Time: Standard processing timeline of 15 business days
-applies.
-
-Additional Information:
-
-Nominee Name: Mrs. Priya Sharma
-Initial Analysis: The submitted documents and medical reports confirm the
-treatment's necessity and validity under the policy terms.
-Final Analysis: Awaiting further verification from your team to finalize
-the claim amount.
-Please let us know if any additional documents or clarifications are
-required to expedite the claim processing.
-
-
-
-
-Regards,
-Rahul T G
-Manager, Ops
-FHPL
-
-    '''
-    response = query_chatgpt(data)
-    print(response)
-
-    # prompt = generate_prompt(text)
-    # response = query_chatgpt(prompt)
-    #
-    #
-    # # Example usage
-    # pdf_path = "documents/Endorsement-Schedule-GMC123456107.pdf"
-    # text = process_pdf(pdf_path)
-
-    # scheduler = BackgroundScheduler()
-    #
-    # scheduler.add_job(job, 'interval', minutes=1)
-    # scheduler.start()
-
-    # try:
-    #     while True:
-    #         pass
-    # except (KeyboardInterrupt, SystemExit):
-    #     scheduler.shutdown()
