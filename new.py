@@ -17,14 +17,13 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 # Azure OpenAI endpoint and API key
 url = "https://acko-01-ai.openai.azure.com/openai/deployments/gpt-4o/chat/completions"
-api_key = ""
 
 
 def query_chatgpt(prompt):
     # Request headers
     headers = {
         "Content-Type": "application/json",
-        "api-key": api_key
+        "api-key": "api_key"
     }
 
     params = {
